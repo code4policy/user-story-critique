@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
 
 [workflows]
-runButton = "Static HTTP Server"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
@@ -18,10 +18,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Flask Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Static HTTP Server"
 
 [[workflows.workflow]]
 name = "Flask Server"
@@ -34,19 +30,9 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "packager.installForAll"
 
-[[workflows.workflow]]
-name = "Static HTTP Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python3 -m http.server 5000"
+args = "python app.py"
 waitForPort = 5000
 
 [[ports]]
