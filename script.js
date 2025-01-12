@@ -1,27 +1,3 @@
-// Prompts for analyzing user stories
-const ANALYSIS_PROMPTS = [
-    {
-        title: "Structure Analysis",
-        prompt: "Analyze if this user story follows the correct 'As a [role] I want [feature] so that [value]' format and provide specific improvements:"
-    },
-    {
-        title: "Role Clarity",
-        prompt: "Evaluate if the role is specific and clear enough. Suggest improvements if needed:"
-    },
-    {
-        title: "Feature Description",
-        prompt: "Assess if the feature is well-defined and actionable. Provide recommendations for improvement:"
-    },
-    {
-        title: "Value Proposition",
-        prompt: "Evaluate if the value statement clearly explains the benefit. Suggest enhancements:"
-    },
-    {
-        title: "Definition of Done Review",
-        prompt: "Review the definition of done criteria for completeness and measurability. Provide specific improvements:"
-    }
-];
-
 // DOM Elements
 const form = document.getElementById('storyForm');
 const apiKeyInput = document.getElementById('apiKey');
@@ -35,13 +11,26 @@ const toggleApiKeyBtn = document.getElementById('toggleApiKey');
 const rememberKeyCheckbox = document.getElementById('rememberKey');
 const spinner = submitButton.querySelector('.spinner-border');
 
+let prompts = []; // Will store prompts loaded from JSON
+
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Load saved API key if exists
     const savedApiKey = localStorage.getItem('openai_api_key');
     if (savedApiKey) {
         apiKeyInput.value = savedApiKey;
         rememberKeyCheckbox.checked = true;
+    }
+
+    // Load prompts from JSON file
+    try {
+        const response = await fetch('attached_assets/prompts.json');
+        if (!response.ok) {
+            throw new Error('Failed to load prompts');
+        }
+        prompts = await response.json();
+    } catch (error) {
+        showError('Failed to load analysis prompts. Please try again later.');
     }
 });
 
@@ -55,11 +44,16 @@ toggleApiKeyBtn.addEventListener('click', () => {
 // Form submission
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!form.checkValidity()) {
         e.stopPropagation();
         form.classList.add('was-validated');
+        return;
+    }
+
+    if (prompts.length === 0) {
+        showError('Analysis prompts not loaded. Please refresh the page.');
         return;
     }
 
@@ -87,8 +81,8 @@ form.addEventListener('submit', async (e) => {
 
 async function analyzeuserStory() {
     const feedback = [];
-    
-    for (const prompt of ANALYSIS_PROMPTS) {
+
+    for (const prompt of prompts) {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -129,12 +123,12 @@ async function analyzeuserStory() {
 
 function displayFeedback(feedback) {
     feedbackContent.innerHTML = '';
-    
+
     feedback.forEach((item, index) => {
         const accordionItem = document.createElement('div');
         accordionItem.className = 'accordion-item feedback-item';
         accordionItem.style.animationDelay = `${index * 0.1}s`;
-        
+
         accordionItem.innerHTML = `
             <h2 class="accordion-header">
                 <button class="accordion-button ${index !== 0 ? 'collapsed' : ''}" type="button" 
@@ -149,7 +143,7 @@ function displayFeedback(feedback) {
                 </div>
             </div>
         `;
-        
+
         feedbackContent.appendChild(accordionItem);
     });
 

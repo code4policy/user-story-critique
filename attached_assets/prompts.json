@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Structure Analysis",
+    "prompt": "Decide if the user story is in the following format \n\nAs a __<role>__, I want __<feature>__, So that __<value>__ \n\n If it is, write a ✅ and explain that they correctly followed the format described, if it is not, write a ❌ and let them know and ask for a user story in the correct format. Do not provide examples. Do not provide critiques."
+  },
+  {
+    "title": "I WANT and SO THAT clauses",
+    "prompt": "Decide if the \"so that\" clause explains a desired outcome or reason behind a user's action. If it does, write a ✅, if it does not, write a ❌ and let them know and ask for a better \"so that\" clause. Do not provide examples. Do not provide critiques. \n\nFinally, decide if the \"i want\" clause defines a feature that meets the user need from the \"so that\" clause. If it does, write a ✅, if it does not, write a ❌ and let them know and ask for a better \"i want\" clause. Do not provide examples. Do not provide critiques."
+  },
+  {
+    "title": "Definition of Done Review",
+    "prompt": "Check the provided definition of done for the following two things\n\n1. Does the student provide an objective test of completion? (mark ✅ or ❌)\n2. Does it test the \"so that\" clause of the user story?  (mark ✅ or ❌)\n\nIf either one is ❌, let them know and ask for a better definition of done. Do not provide examples. Do not provide critiques."
+  }
+]
