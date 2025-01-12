@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Story Helper</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="text-center mb-5">
+            <h1 class="display-4">User Story Helper</h1>
+            <p class="lead">Improve your user story writing skills with AI-powered feedback</p>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form id="storyForm" class="needs-validation" novalidate>
+                    <div class="mb-4">
+                        <label for="apiKey" class="form-label">OpenAI API Key</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="apiKey" required>
+                            <button class="btn btn-secondary" type="button" id="toggleApiKey">
+                                Show
+                            </button>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="rememberKey">
+                            <label class="form-check-label" for="rememberKey">
+                                Remember API key
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="userStory" class="form-label">User Story</label>
+                        <textarea class="form-control" id="userStory" rows="3" 
+                            placeholder="As a [role] I want [feature] so that [value]" required></textarea>
+                        <div class="form-text">
+                            Follow the format: "As a [role] I want [feature] so that [value]"
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="definitionOfDone" class="form-label">Definition of Done</label>
+                        <textarea class="form-control" id="definitionOfDone" rows="3" 
+                            placeholder="List the criteria that must be met for this story to be considered complete" required></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="submitButton">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Get Feedback
+                        </button>
+                    </div>
+                </form>
+
+                <div id="feedbackContainer" class="mt-5 d-none">
+                    <h2 class="h4 mb-4">Feedback</h2>
+                    <div id="feedbackContent" class="accordion"></div>
+                </div>
+
+                <div id="errorAlert" class="alert alert-danger mt-3 d-none" role="alert"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
