@@ -122,7 +122,8 @@ async function analyzeuserStory() {
                         content: `User Story: ${userStoryInput.value}\nDefinition of Done: ${definitionOfDoneInput.value}\n\n${prompt.prompt}`
                     }
                 ],
-                temperature: 0.7
+                temperature: 0.7,
+                max_tokens: 1000
             })
         });
 
