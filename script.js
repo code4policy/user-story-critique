@@ -90,7 +90,7 @@ async function analyzeuserStory() {
                 'Authorization': `Bearer ${apiKeyInput.value}`
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "gpt-4-turbo-preview",
                 messages: [
                     {
                         role: "system",
@@ -101,8 +101,7 @@ async function analyzeuserStory() {
                         content: `User Story: ${userStoryInput.value}\nDefinition of Done: ${definitionOfDoneInput.value}\n\n${prompt.prompt}`
                     }
                 ],
-                temperature: 0.7,
-                max_tokens: 250
+                temperature: 0.7
             })
         });
 
