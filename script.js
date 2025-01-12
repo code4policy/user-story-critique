@@ -10,6 +10,9 @@ const errorAlert = document.getElementById('errorAlert');
 const toggleApiKeyBtn = document.getElementById('toggleApiKey');
 const rememberKeyCheckbox = document.getElementById('rememberKey');
 const spinner = submitButton.querySelector('.spinner-border');
+const togglePromptsBtn = document.getElementById('togglePrompts');
+const promptsContainer = document.getElementById('promptsContainer');
+const promptsList = document.getElementById('promptsList');
 
 let prompts = []; // Will store prompts loaded from JSON
 
@@ -29,10 +32,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Failed to load prompts');
         }
         prompts = await response.json();
+        displayPrompts(); // Display prompts in the UI
     } catch (error) {
         showError('Failed to load analysis prompts. Please try again later.');
     }
 });
+
+// Toggle prompts visibility
+togglePromptsBtn.addEventListener('click', () => {
+    const isHidden = promptsContainer.classList.contains('d-none');
+    promptsContainer.classList.toggle('d-none');
+    togglePromptsBtn.textContent = isHidden ? 'Hide Analysis Prompts' : 'Show Analysis Prompts';
+});
+
+// Display prompts in the UI
+function displayPrompts() {
+    promptsList.innerHTML = prompts.map((prompt, index) => `
+        <div class="list-group-item">
+            <h6 class="mb-1">${prompt.title}</h6>
+            <p class="mb-1 text-body-secondary small">${prompt.prompt}</p>
+        </div>
+    `).join('');
+}
 
 // Toggle API key visibility
 toggleApiKeyBtn.addEventListener('click', () => {
