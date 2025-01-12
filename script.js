@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load prompts from JSON file
     try {
-        const response = await fetch('attached_assets/prompts.json');
+        const response = await fetch('/static/prompts.json');
         if (!response.ok) {
             throw new Error('Failed to load prompts');
         }
@@ -93,6 +93,13 @@ form.addEventListener('submit', async (e) => {
     try {
         const feedback = await analyzeuserStory();
         displayFeedback(feedback);
+
+        // Save feedback to Google Sheets
+        await saveFeedbackToSheet(
+            userStoryInput.value,
+            definitionOfDoneInput.value,
+            feedback
+        );
     } catch (error) {
         showError(error.message);
     } finally {
@@ -140,6 +147,30 @@ async function analyzeuserStory() {
     }
 
     return feedback;
+}
+
+async function saveFeedbackToSheet(userStory, definitionOfDone, feedback) {
+    try {
+        const response = await fetch('/save-feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userStory,
+                definitionOfDone,
+                feedback
+            })
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to save feedback');
+        }
+    } catch (error) {
+        console.error('Error saving feedback:', error);
+        showError('Failed to save feedback to Google Sheets. Your feedback was still generated successfully.');
+    }
 }
 
 function displayFeedback(feedback) {
