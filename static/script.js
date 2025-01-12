@@ -108,29 +108,45 @@ form.addEventListener('submit', async (e) => {
 });
 
 async function analyzeuserStory() {
-    try {
-        const response = await fetch('/analyze', {
+    const feedback = [];
+
+    for (const prompt of prompts) {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKeyInput.value}`
             },
             body: JSON.stringify({
-                apiKey: apiKeyInput.value,
-                userStory: userStoryInput.value,
-                definitionOfDone: definitionOfDoneInput.value
+                model: "gpt-4-turbo-preview",
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are an expert in agile methodologies and user story writing. Provide specific, actionable feedback."
+                    },
+                    {
+                        role: "user",
+                        content: `User Story: ${userStoryInput.value}\nDefinition of Done: ${definitionOfDoneInput.value}\n\n${prompt.prompt}`
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 1000
             })
         });
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Failed to get feedback');
+            throw new Error(error.error?.message || 'Failed to get feedback');
         }
 
         const data = await response.json();
-        return data.feedback;
-    } catch (error) {
-        throw new Error(error.message || 'Failed to analyze user story');
+        feedback.push({
+            title: prompt.title,
+            content: data.choices[0].message.content
+        });
     }
+
+    return feedback;
 }
 
 async function saveFeedbackToSheet(userStory, definitionOfDone, feedback) {

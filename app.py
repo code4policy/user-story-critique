@@ -1,11 +1,9 @@
 import os
-import json
 from flask import Flask, render_template, request, jsonify
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
 import logging
-import requests
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -25,67 +23,33 @@ logger.info(f"To enable Google Sheets integration, please share your Google Shee
 def index():
     return render_template('index.html')
 
-@app.route('/analyze', methods=['POST'])
-def analyze_story():
+@app.route('/save-feedback', methods=['POST'])
+def save_feedback():
     try:
         data = request.json
-        api_key = data.get('apiKey')
+
+        # Extract data from the request
         user_story = data.get('userStory')
         definition_of_done = data.get('definitionOfDone')
+        feedback = data.get('feedback')
 
-        # Load prompts
-        with open('static/prompts.json', 'r') as f:
-            prompts = json.load(f)
+        # Prepare row data
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        row = [timestamp, user_story, definition_of_done]
 
-        feedback = []
-        for prompt in prompts:
-            response = requests.post(
-                'https://api.openai.com/v1/chat/completions',
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Bearer {api_key}'
-                },
-                json={
-                    'model': "gpt-4-turbo-preview",
-                    'messages': [
-                        {
-                            'role': "system",
-                            'content': "You are an expert in agile methodologies and user story writing. Provide specific, actionable feedback."
-                        },
-                        {
-                            'role': "user",
-                            'content': f"User Story: {user_story}\nDefinition of Done: {definition_of_done}\n\n{prompt['prompt']}"
-                        }
-                    ],
-                    'temperature': 0.7,
-                    'max_tokens': 1000
-                }
-            )
-
-            if not response.ok:
-                error = response.json()
-                raise Exception(error.get('error', {}).get('message', 'Failed to get feedback'))
-
-            result = response.json()
-            feedback.append({
-                'title': prompt['title'],
-                'content': result['choices'][0]['message']['content']
-            })
-
-        # Save to Google Sheets
-        row = [datetime.now().strftime('%Y-%m-%d %H:%M:%S'), user_story, definition_of_done]
+        # Add each feedback item
         for item in feedback:
             row.extend([item['title'], item['content']])
 
-        append_to_sheet(row)
+        # Save to Google Sheets
+        result = append_to_sheet(row)
 
-        return jsonify({"success": True, "feedback": feedback})
-
+        return jsonify({"success": True, "message": "Feedback saved successfully"})
     except Exception as e:
         error_message = str(e)
         if "The caller does not have permission" in error_message:
             error_message = f"Permission denied. Please share the Google Sheet with this service account email: {service_account_email}"
-        logger.error(f"Error analyzing story: {error_message}", exc_info=True)
+        logger.error(f"Error saving feedback: {error_message}", exc_info=True)
         return jsonify({"success": False, "message": error_message}), 500
 
 def append_to_sheet(row):
