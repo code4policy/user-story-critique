@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load prompts from JSON file
     try {
-        const response = await fetch('/attached_assets/prompts.json');
+        const response = await fetch('/static/prompts.json');
         if (!response.ok) {
             throw new Error('Failed to load prompts');
         }
