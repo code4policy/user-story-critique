@@ -15,6 +15,10 @@ app = Flask(__name__)
 app.static_folder = 'static'
 app.template_folder = 'templates'
 
+# Print service account email for setup
+service_account_email = os.environ.get('GOOGLE_CLIENT_EMAIL')
+logger.info(f"To enable Google Sheets integration, please share your Google Sheet with this email: {service_account_email}")
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -44,7 +48,7 @@ def save_feedback():
     except Exception as e:
         error_message = str(e)
         if "The caller does not have permission" in error_message:
-            error_message = "Permission denied. Please ensure the Google Sheet is shared with the service account email."
+            error_message = f"Permission denied. Please share the Google Sheet with this service account email: {service_account_email}"
         logger.error(f"Error saving feedback: {error_message}", exc_info=True)
         return jsonify({"success": False, "message": error_message}), 500
 
