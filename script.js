@@ -10,6 +10,9 @@ const errorAlert = document.getElementById('errorAlert');
 const toggleApiKeyBtn = document.getElementById('toggleApiKey');
 const rememberKeyCheckbox = document.getElementById('rememberKey');
 const spinner = submitButton.querySelector('.spinner-border');
+const togglePromptsBtn = document.getElementById('togglePrompts');
+const promptsContainer = document.getElementById('promptsContainer');
+const promptsList = document.getElementById('promptsList');
 
 let prompts = []; // Will store prompts loaded from JSON
 
@@ -29,10 +32,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Failed to load prompts');
         }
         prompts = await response.json();
+        displayPrompts(); // Display prompts in the UI
     } catch (error) {
         showError('Failed to load analysis prompts. Please try again later.');
     }
 });
+
+// Toggle prompts visibility
+togglePromptsBtn.addEventListener('click', () => {
+    const isHidden = promptsContainer.classList.contains('d-none');
+    promptsContainer.classList.toggle('d-none');
+    togglePromptsBtn.textContent = isHidden ? 'Hide Analysis Prompts' : 'Show Analysis Prompts';
+});
+
+// Display prompts in the UI
+function displayPrompts() {
+    promptsList.innerHTML = prompts.map((prompt, index) => `
+        <div class="list-group-item">
+            <h6 class="mb-1">${prompt.title}</h6>
+            <p class="mb-1 text-body-secondary small">${prompt.prompt}</p>
+        </div>
+    `).join('');
+}
 
 // Toggle API key visibility
 toggleApiKeyBtn.addEventListener('click', () => {
@@ -90,20 +111,18 @@ async function analyzeuserStory() {
                 'Authorization': `Bearer ${apiKeyInput.value}`
             },
             body: JSON.stringify({
-                // the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
-                // do not change this unless explicitly requested by the user
-                model: "gpt-4o",
+                model: "gpt-4-turbo-preview",
                 messages: [
                     {
                         role: "system",
-                        content: "You are an expert in agile methodologies and user story writing. Your task is to provide detailed, specific feedback that helps users improve their user stories. Be thorough in your analysis and provide clear explanations for your feedback. Your responses should be comprehensive and actionable."
+                        content: "You are an expert in agile methodologies and user story writing. Provide specific, actionable feedback."
                     },
                     {
                         role: "user",
                         content: `User Story: ${userStoryInput.value}\nDefinition of Done: ${definitionOfDoneInput.value}\n\n${prompt.prompt}`
                     }
                 ],
-                temperature: 1
+                temperature: 0.7
             })
         });
 
